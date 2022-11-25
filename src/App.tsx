@@ -1,26 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "./redux/hooks/hooks";
+import { checkAction } from "./redux/action/userAction";
+import HeaderComponent from "./component/organism/header";
+import { AuthRoute } from "./route/route";
 
-function App() {
+const App = () => {
+  const { auth } = useAppSelector((state) => state.AuthorizationReducer);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      dispatch(checkAction());
+    }
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <HeaderComponent />
+      {AuthRoute.map(({ Component, path }) => (
+        <Routes key={path}>
+          <Route path={`/${path}`} element={<Component />} />
+        </Routes>
+      ))}
+    </Router>
   );
-}
+};
 
 export default App;
